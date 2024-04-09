@@ -1,7 +1,7 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php');
-//$stripeSecretKey = 'sk_test_51NsPv0AXV3XqsQb47u6Fps8IWSuTJSzVSDbyptKDWt9nqVaC8GLACdEuWCQYNZJJStNU4zS4gFcxNEh8N526r9B300NlrprFdE';
-$stripeSecretKey = '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';
+//$stripeSecretKey = '';
+$stripeSecretKey = '';
 header("Content-type: application/json");
 \Stripe\Stripe::setApiKey($stripeSecretKey);
 
