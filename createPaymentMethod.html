@@ -1,0 +1,105 @@
+
+
+<script>
+var stripe = Stripe('');
+
+
+const elements = stripe.elements();
+const options = {
+  'hidePostalCode':true  
+};
+var cardElement = elements.create('card', {
+  style: {
+    base: {
+	
+      iconColor: '#019ef7',
+      color: '#000',
+      fontWeight: '500',
+      fontSize: '17px',
+      padding: '12px',
+      fontSmoothing: 'antialiased',
+      ':-webkit-autofill': {
+        color: '#000',
+      },
+      '::placeholder': {
+        color: '#019ef7',
+      }
+    },
+    invalid: {
+      iconColor: '#074d04',
+      color: '#074d04',
+    },
+  },
+  hidePostalCode:true
+}
+
+
+);
+
+cardElement.mount('#card-element');
+
+var form = document.getElementById('payment-form');
+
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  stripe.createPaymentMethod({
+    type: 'card',
+    card: cardElement,
+  }).then(function(result) {
+    if (result.error) {
+      var errorElement = document.getElementById('card-errors');
+      errorElement.textContent = result.error.message;
+    } else {
+      createCustomer(result.paymentMethod,result);
+    }
+  });
+	
+	
+	
+});
+
+function createCustomer(paymentMethod,data) {
+	$('.load_img').show();
+  	var phone =  $('#inputPhone').val();
+  fetch('create_customer_test.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      paymentMethodId: paymentMethod,
+	    phone: phone,
+      data: data,
+		site: '[(site_name)]',
+    })
+  })
+
+ 
+
+  .then((response) => {
+      return response.json();
+  })  
+  .then((data) => {
+    console.log(data);
+    
+ 	$('.load_img').hide();
+    if(data==1){
+      console.log('всё ok');		
+      //$(location).attr('href','https://search.iqmoservice.com/app/');
+    }
+	if(data==2){
+      console.log('Оплата не прошла');
+		  document.getElementById('card-errors').innerHTML = 'Your card has insufficient funds.';
+    }
+  })
+  .catch((error) => {
+	$('.load_img').hide();
+    console.log(error);
+    document.getElementById('card-errors').innerHTML = 'Your card has insufficient funds.';
+  });
+
+}
+
+
+</script>
