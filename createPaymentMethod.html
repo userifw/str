@@ -1,4 +1,24 @@
+<form action="create_customer.php" method="post" id="payment-form" class="hidden_">
+				<div class="modal__header text-center">
+					
+					
+				</div>					
+				  <div class="form-row">
+					<label for="card-element">
+						<h3 class="modal__title">Credit or debit card</h3>
+					</label>
+					<div id="card-element">
+					</div>
 
+					<!-- Used to display form errors. -->
+					<div id="card-errors" role="alert"></div>
+				  </div>
+
+				  <input type="hidden" value="price_1O1pU0AXV3XqsQb4KG2AFRnw" name="price" id="price">
+				  <button class="btn_ form__btn"
+						  style="background-color: #009ef7; margin-top: 12px; color: #fff;"
+						  >Submit Payment</button>
+</form>
 
 <script>
 var stripe = Stripe('');
