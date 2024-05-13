@@ -1,30 +1,40 @@
 <script>
 var stripe = Stripe('');
 
+
+// Pass the appearance object to the Elements instance
 const elements = stripe.elements();
 const options = {
   'hidePostalCode':true  
 };
-
 var cardElement = elements.create('card', {
   style: {
     base: {
+	
       iconColor: '#019ef7',
       color: '#000',
       fontWeight: '500',
+      //fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
       fontSize: '17px',
       padding: '12px',
       fontSmoothing: 'antialiased',
-      ':-webkit-autofill': { color: '#000' },
-      '::placeholder': { color: '#019ef7' }
+      ':-webkit-autofill': {
+        color: '#000',
+      },
+      '::placeholder': {
+        color: '#019ef7',
+      }
     },
     invalid: {
       iconColor: '#074d04',
       color: '#074d04',
-    }
+    },
   },
-  hidePostalCode: true
-});
+  hidePostalCode:true
+}
+
+
+);
 
 cardElement.mount('#card-element');
 
@@ -32,54 +42,75 @@ var form = document.getElementById('payment-form');
 
 form.addEventListener('submit', function(event) {
   event.preventDefault();
-
-  stripe.createPaymentMethod('card', cardElement, {
-    billing_details: {}
+	console.log('submit');
+  stripe.createPaymentMethod({
+    type: 'card',
+    card: cardElement,
   }).then(function(result) {
     if (result.error) {
       var errorElement = document.getElementById('card-errors');
       errorElement.textContent = result.error.message;
     } else {
-      // Assuming the createCustomer function needs the payment method and other data
-      createCustomer(result.paymentMethod, result);
+      createCustomer(result.paymentMethod);
     }
   });
+	
+	
+	
 });
 
-function createCustomer(paymentMethod, data) {
-    $('.load_img').show();
-    var phone =  $('#inputPhone').val();
-    fetch('create_customer_test.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            paymentMethodId: paymentMethod.id,
-            phone: phone,
-            data: data,
-            site: '[(site_name)]',
-        })
+function createCustomer(paymentMethod,data) {
+	$('.load_img').show();
+  	var phone =  $('#inputPhone').val();
+	
+	var email =  $('#email').val();
+	//console.log(email+price);
+	
+  fetch('create_customer.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      paymentMethodId: paymentMethod,
+	  phone: phone,
+	  data: data,
+      email: email,
+	  site: '[(site_name)]',
     })
-    .then(function(response) {
-        return response.json();
-    })  
-    .then(function(data) {
-        $('.load_img').hide();
-        if (data === 1){
-            console.log('всё ok');     
-            window.location.href = 'https://search.iqmoservice.com/app/';
-        }
-        if (data === 2){
-            console.log('Оплата не прошла');
-            document.getElementById('card-errors').innerHTML = 'Your card has insufficient funds.';
-        }
-    })
-    .catch(function(error) {
-        $('.load_img').hide();
-        console.log(error);
-        document.getElementById('card-errors').innerHTML = 'Error processing payment.';
-    });
-}
+  })
+  // .then(
+  //   response => response.json()
+  // )
+  // .then(
+  //   data => console.log(data),
 
-</script>
+  // )
+ 
+
+  .then((response) => {
+      return response.json();
+  })  
+  .then((data) => {
+    console.log(data);
+    
+ 	$('.load_img').hide();
+    if(data==1){
+      console.log('всё ok');		
+      $(location).attr('href','https://search.iqmoservice.com/app/');
+    }
+	if(data==2){
+      console.log('Оплата не прошла');
+		document.getElementById('card-errors').innerHTML = 'Your card has insufficient funds.';
+    }
+   
+    //console.log(m);
+  })
+  .catch((error) => {
+	$('.load_img').hide();
+    console.log(error);
+    document.getElementById('card-errors').innerHTML = 'Your card has insufficient funds.';
+  });
+
+}
+</script>  
